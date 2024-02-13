@@ -24,8 +24,20 @@ For example:
 
 This extension contributes the following settings:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+    "custom-text-transform.transforms": [
+        {
+        "name": "Variable list into Python dictionary",
+        "function": "const variableList = input.split(',').map(varName => varName.trim()); return '{' + variableList.map(varName => `'${varName}':${varName}`).join(', ') + '}';"
+        },
+        {
+        "name": "Variable list into kwargs",
+        "function": "const variableList = input.split(',').map(varName => varName.trim()); return variableList.map(varName => `${varName}=${varName}`).join(', ');"
+        }
+    ]
+
+
+
+
 
 ## Known Issues
 
