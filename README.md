@@ -49,6 +49,15 @@ Added features X, Y, and Z.
 
 ---
 
+# Related Emojis
+
+♻↪️
+✔️➡
+🌀
+↗
+🌟✨💫⚡
+🆕
+
 ## Following extension guidelines
 
 Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.

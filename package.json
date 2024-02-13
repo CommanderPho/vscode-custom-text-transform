@@ -12,10 +12,41 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+      "configuration": {
+        "title": "Custom Text Transform",
+        "properties": {
+            "custom-text-transform.transforms": {
+                "type": "array",
+                "default": [],
+                "description": "Array of custom text transformations",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "Name of the transform"
+                        },
+                        "function": {
+                            "type": "string",
+                            "description": "Transformation function as a string"
+                        }
+                    }
+                }
+            }
+        }
+    },
     "commands": [
       {
         "command": "custom-text-transform.helloWorld",
-        "title": "Hello World"
+        "title": "🌀Custom Transform: Hello World"
+      },
+      {
+        "command": "custom-text-transform.listCustomTransforms",
+        "title": "🌀📜List Custom Transforms"
+      },
+      {
+        "command": "custom-text-transform.transformSelectedText",
+        "title": "🌀💫Custom Transform Selected Text..."
       }
     ]
   },
