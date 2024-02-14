@@ -40,7 +40,8 @@ export function activate(context: vscode.ExtensionContext) {
     });
     context.subscriptions.push(disposable_list_customTransforms);
 
-	let disposable_transformSelectedText = vscode.commands.registerCommand('custom-text-transform.transformSelectedText', () => {
+
+    let disposable_transformSelectedText = vscode.commands.registerCommand('custom-text-transform.transformSelectedText', async () => {
         // Access the custom setting
         const config = vscode.workspace.getConfiguration('custom-text-transform');
         const transforms = config.get<{ name: string, function: string }[]>('transforms');
@@ -52,18 +53,30 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         if (transforms && transforms.length > 0) {
-            // Use the first transformation for demonstration purposes
-            const transform = transforms[0];
+            // Allow the user to type and pick a transform name with auto-complete
+            const picked = await vscode.window.showQuickPick(
+                transforms.map(transform => transform.name),
+                {
+                    placeHolder: 'Type or pick a transform to apply',
+                    matchOnDetail: true
+                }
+            );
+            
+            const transform = transforms.find(t => t.name === picked);
+            if (!transform) {
+                vscode.window.showInformationMessage(`No transform selected.`);
+                return;
+            }
 
             // Execute the actual transformation if a selection is available
             const selection = editor.selection;
             const text = editor.document.getText(selection);
-            
+
             // WARNING: Executing arbitrary code using eval has security implications and should be done with caution.
             try {
                 // Here we're using `eval` to dynamically execute the function.
                 // The function code is expected to be a string in which `input` is the parameter that represents the selected text.
-                const transformedText = eval(`(function(input){${transform.function}})('${text}')`);
+                const transformedText = eval(`(function(input){${transform.function}})('${text.replace(/'/g, "\\'")}')`);
 
                 // Apply the transformed text back to the document
                 editor.edit((editBuilder) => {
@@ -79,6 +92,63 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
     context.subscriptions.push(disposable_transformSelectedText);
+
+
+    // // Perform the selected transform
+	// let disposable_transformSelectedText = vscode.commands.registerCommand('custom-text-transform.transformSelectedText', async () => {
+    //     // Access the custom setting
+    //     const config = vscode.workspace.getConfiguration('custom-text-transform');
+    //     const transforms = config.get<{ name: string, function: string }[]>('transforms');
+
+    //     const editor = vscode.window.activeTextEditor;
+    //     if (!editor) {
+    //         vscode.window.showInformationMessage('You need to open an editor to transform text.');
+    //         return; // Exit if there is no open text editor
+    //     }
+
+    //     if (transforms && transforms.length > 0) {
+    //         // Use the first transformation for demonstration purposes
+    //         // const transform = transforms[0];
+    //         // Allow the user to type and pick a transform name with auto-complete
+    //         const picked = await vscode.window.showQuickPick(
+    //             transforms.map(transform => transform.name),
+    //             {
+    //                 placeHolder: 'Type or pick a transform to apply',
+    //                 matchOnDetail: true
+    //             }
+    //         );
+            
+    //         const transform = transforms.find(t => t.name === picked);
+    //         if (!transform) {
+    //             vscode.window.showInformationMessage(`No transform selected.`);
+    //             return;
+    //         }
+
+
+    //         // Execute the actual transformation if a selection is available
+    //         const selection = editor.selection;
+    //         const text = editor.document.getText(selection);
+            
+    //         // WARNING: Executing arbitrary code using eval has security implications and should be done with caution.
+    //         try {
+    //             // Here we're using `eval` to dynamically execute the function.
+    //             // The function code is expected to be a string in which `input` is the parameter that represents the selected text.
+    //             const transformedText = eval(`(function(input){${transform.function}})('${text}')`);
+
+    //             // Apply the transformed text back to the document
+    //             editor.edit((editBuilder) => {
+    //                 editBuilder.replace(selection, transformedText);
+    //             });
+
+    //             vscode.window.showInformationMessage(`Using transform: ${transform.name}`);
+    //         } catch (error) {
+    //             vscode.window.showErrorMessage(`Error applying transform: ${transform.name}. Please check the function syntax.`);
+    //         }
+    //     } else {
+    //         vscode.window.showInformationMessage('No custom transforms defined. Add some to settings.json.');
+    //     }
+    // });
+    // context.subscriptions.push(disposable_transformSelectedText);
 
 
 }
