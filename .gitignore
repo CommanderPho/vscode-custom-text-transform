@@ -3,3 +3,5 @@ dist
 node_modules
 .vscode-test/
 *.vsix
+desktop.ini
+FM-{DB3294A3-4CF0-4EDA-B28D-3C7C0BDFBF5A}.ico
