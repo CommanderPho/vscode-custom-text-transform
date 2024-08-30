@@ -23,12 +23,6 @@
 			"command": "workbench.action.navigateForward"
 		},
 		{
-			"name": "Toggle Cell Output Scrolling",
-			"color": "orange",
-			"useVsCodeApi": true,
-			"command": "notebook.cell.toggleOutputScrolling"
-		},
-		{
 			"name": "Restart Python Language Server",
 			"color": "#00FF00",
 			"useVsCodeApi": true,
@@ -46,6 +40,6 @@
 		],
 		"defaultColor": "grey",
 		"reloadButton": "↻",
-		"loadNpmCommands": false
+		"loadNpmCommands": true
 	},
 }

@@ -150,6 +150,35 @@ export function activate(context: vscode.ExtensionContext) {
     // });
     // context.subscriptions.push(disposable_transformSelectedText);
 
+	// Register a completion item provider for custom transforms
+    const transformProvider = vscode.languages.registerCompletionItemProvider(
+        { scheme: 'file', language: '*' },  // Target all files and languages
+        {
+            provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
+                const config = vscode.workspace.getConfiguration('custom-text-transform');
+                const transforms = config.get<{ name: string, function: string }[]>('transforms');
+
+                if (!transforms) {
+                    return [];
+                }
+
+                // Create completion items for each transform
+                const completionItems: vscode.CompletionItem[] = transforms.map(transform => {
+                    const item = new vscode.CompletionItem(transform.name, vscode.CompletionItemKind.Snippet);
+                    item.detail = 'Custom Text Transform';
+                    item.insertText = new vscode.SnippetString(`${transform.name}`);
+                    item.command = { command: 'custom-text-transform.applySnippetTransform', title: 'Apply Transform', arguments: [transform.name] };
+
+                    return item;
+                });
+
+                return completionItems;
+            }
+        },
+        ' ' // Trigger completion after typing a space
+    );
+
+    context.subscriptions.push(transformProvider);
 
 }
 
