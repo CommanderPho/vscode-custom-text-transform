@@ -15,45 +15,45 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
-      "configuration": {
-        "title": "Custom Text Transform",
-        "properties": {
-            "custom-text-transform.transforms": {
-                "type": "array",
-                "default": [
-                        {
-                        "name": "Variable list into Python dictionary",
-                        "function": "const variableList = input.split(',').map(varName => varName.trim()); return '{' + variableList.map(varName => `'${varName}':${varName}`).join(', ') + '}'"
-                        },
-                        {
-                        "name": "Variable list into kwargs",
-                        "function": "const variableList = input.split(',').map(varName => varName.trim()); return variableList.map(varName => `${varName}=${varName}`).join(', ')"
-                        },
-                        {
-                        "name": "Function definition into classdef method definition",
-                        "function": "const lines = input.trim().split('\\n'); const funcName = lines[0].trim().split(' ')[1].split('(')[0]; const args = lines[0].trim().split('(')[1].split(')')[0].split(',').map(arg => arg.trim()); const body = lines.slice(1, -1).join('\\n'); return `def ${funcName}(self, ${args.join(', ')}):${body ? '\\n' + body : ''}`"
-                        },
-                        {
-                        "name": "Python function definition to kwargs call",
-                        "function": "return input.replace(/def\\s+(\\w+)\\(([^)]*)\\):[\\s\\S]*/, (_, fnName, params) => fnName + '(' + params.replace(/\\w+\\s*(?:\\:[^=,]+)?\\s*(=\\s*[^,]+)?/g, (p) => p.trim().split('=')[0].trim() + '=' + p.trim().split('=')[0].trim()).split(',').join(', ') + ')')"
-                        }
-                ],
-                "description": "Array of custom text transformations",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "name": {
-                            "type": "string",
-                            "description": "Name of the transform"
-                        },
-                        "function": {
-                            "type": "string",
-                            "description": "Transformation function as a string"
-                        }
-                    }
-                }
+    "configuration": {
+      "title": "Custom Text Transform",
+      "properties": {
+        "custom-text-transform.transforms": {
+          "type": "array",
+          "default": [
+            {
+              "name": "Variable list into Python dictionary",
+              "function": "const variableList = input.split(',').map(varName => varName.trim()); return '{' + variableList.map(varName => `'${varName}':${varName}`).join(', ') + '}'"
+            },
+            {
+              "name": "Variable list into kwargs",
+              "function": "const variableList = input.split(',').map(varName => varName.trim()); return variableList.map(varName => `${varName}=${varName}`).join(', ')"
+            },
+            {
+              "name": "Function definition into classdef method definition",
+              "function": "const lines = input.trim().split('\\n'); const funcName = lines[0].trim().split(' ')[1].split('(')[0]; const args = lines[0].trim().split('(')[1].split(')')[0].split(',').map(arg => arg.trim()); const body = lines.slice(1, -1).join('\\n'); return `def ${funcName}(self, ${args.join(', ')}):${body ? '\\n' + body : ''}`"
+            },
+            {
+              "name": "Python function definition to kwargs call",
+              "function": "return input.replace(/def\\s+(\\w+)\\(([^)]*)\\):[\\s\\S]*/, (_, fnName, params) => fnName + '(' + params.replace(/\\w+\\s*(?:\\:[^=,]+)?\\s*(=\\s*[^,]+)?/g, (p) => p.trim().split('=')[0].trim() + '=' + p.trim().split('=')[0].trim()).split(',').join(', ') + ')')"
             }
+          ],
+          "description": "Array of custom text transformations",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the transform"
+              },
+              "function": {
+                "type": "string",
+                "description": "Transformation function as a string"
+              }
+            }
+          }
         }
+      }
     },
     "commands": [
       {
@@ -75,18 +75,19 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
+    "package": "npm run compile && vsce package",
     "lint": "eslint src --ext ts",
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.88.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
+    "@types/vscode": "^1.88.0",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
-    "eslint": "^8.56.0",
-    "typescript": "^5.3.3",
     "@vscode/test-cli": "^0.0.4",
-    "@vscode/test-electron": "^2.3.9"
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
   }
 }
