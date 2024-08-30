@@ -1,0 +1,4 @@
+{
+  "key": "ctrl+shift+1",
+  "command": "custom-text-transform.snippet.VariableListToDict"
+}
