@@ -114,7 +114,7 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                 <input type="text" id="name" placeholder="Transform Name" />
                 <br />
                 <label for="function">Function:</label>
-                <textarea id="function" rows="10" cols="50" placeholder="Enter JavaScript Function"></textarea>
+                <textarea id="function" rows="10" cols="120" placeholder="Enter JavaScript Function" style="font-size: 12px; font-family: monospace;"></textarea>
                 <br />
                 <button id="save">Save Transform</button>
                 <button id="delete">Delete Transform</button>
