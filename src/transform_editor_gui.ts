@@ -53,6 +53,9 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                     if (!Array.isArray(transforms)) {
                         transforms = [];
                     }
+					// transforms = transforms.map(t => ({ name: t.name, function: t.function.replace(/;/g, ';\n') })); // Add newlines for display
+					transforms = transforms.map(t => ({ name: t.name, function: t.function.replace(/;(?!\n)/g, ';\n') })); // Add newlines for display
+
                     webviewView.webview.postMessage({ command: 'loadTransforms', transforms });
 					// webviewView.webview.postMessage({
 					// 	command: 'populateEditor',
@@ -150,6 +153,17 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
 
 	private _getHtmlForWebview(webview: vscode.Webview) {
         const nonce = getNonce();
+		const scriptUri = webview.asWebviewUri(
+			vscode.Uri.joinPath(this._extensionUri, 'media', 'bundled.js') // Adjust to your bundled file location
+		);
+
+
+		const test_area_htmls = `<div id="test_area_widgets">
+		<vscode-textarea id="test-input" placeholder="Enter test text" rows="5" style="width: 100%; margin-top: 20px;"></vscode-textarea>
+		<vscode-textarea id="test-output" placeholder="Transform result" rows="5" readonly style="width: 100%; margin-top: 10px;"></vscode-textarea>
+		<vscode-button id="apply-transform" appearance="secondary" style="margin-top: 10px;">Apply Transform</vscode-button>
+		</div>`;
+
 		/* ================================================================================================================== */
 		/* Basic TextArea Version                                                                                             */
 		/* ================================================================================================================== */
@@ -160,6 +174,31 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Transform Editor</title>
+				<script
+				src="node_modules/@vscode-elements/elements/dist/bundled.js"
+				type="module"
+				></script>
+				<style>
+					body {
+						font-family: var(--vscode-font-family);
+						margin: 0;
+						padding: 0 10px;
+					}
+					vscode-dropdown, vscode-textfield, vscode-textarea {
+						width: 100%;
+						margin-bottom: 10px;
+					}
+					#function {
+						font-family: monospace;
+						font-size: 12px;
+						width: 100%;
+						height: 200px;
+						margin-bottom: 10px;
+					}
+					vscode-button {
+						margin-right: 10px;
+					}
+				</style>
             </head>
             <body>
                 <h1>Text Transform Editor</h1>
@@ -169,13 +208,14 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                 </select>
                 <br />
                 <label for="name">Name:</label>
-                <input type="text" id="name" placeholder="Transform Name" style="width: 90%;/>
+                <input type="text" id="name" placeholder="Transform Name" style="width: 90%;" />
                 <br />
                 <label for="function">Function:</label>
 				<textarea id="function" rows="10" cols="120" placeholder="Enter JavaScript Function" style="font-size: 12px; font-family: monospace;"></textarea>
                 <br />
                 <button id="save">Save Transform</button>
                 <button id="delete">Delete Transform</button>
+				${test_area_htmls}
                 <div id="output"></div>
                 <script nonce="${nonce}">
                     const vscode = acquireVsCodeApi();
@@ -203,11 +243,7 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                         const selectedTransform = transforms.find(t => t.name === selectedName);
                         if (selectedTransform) {
                             document.getElementById('name').value = selectedTransform.name;
-							<!-- const originalString = selectedTransform.function;  -->
-							<!-- const updatedString = originalString.replace(/;/g, ';\n'); -->
-                            <!-- document.getElementById('function').value = originalString;  -->
 							document.getElementById('function').value = selectedTransform.function;
-
                         }
                     });
 

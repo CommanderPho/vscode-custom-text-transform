@@ -28,6 +28,13 @@ To define custom transforms:
 
 ```
 
+## Dev Notes
+
+```bash
+npm install
+cp -R node_modules/@vscode-elements/elements/dist/*  media/
+
+```
 
 ## Known Issues
 
