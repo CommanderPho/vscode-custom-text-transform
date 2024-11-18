@@ -81,6 +81,29 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                     await config.update('transforms', transforms, vscode.ConfigurationTarget.Global);
                     vscode.window.showInformationMessage(`Transform "${message.name}" deleted.`);
                     break;
+
+                case 'executeTransform':
+                    // transforms = transforms.filter(t => t.name !== message.name);
+					// message.function = message.function.replace(/;(?!\n)/g, ';\n'); // Add newlines for display
+					const function_code = message.function;
+					const text = message.arguments
+					
+					// WARNING: Executing arbitrary code using eval has security implications and should be done with caution.
+					try {
+						// Here we're using `eval` to dynamically execute the function.
+						// The function code is expected to be a string in which `input` is the parameter that represents the selected text.
+						const transformedText = eval(`(function(input){${function_code}})('${text.replace(/'/g, "\\'")}')`);
+
+						// Apply the transformed text back to the document
+						vscode.window.showInformationMessage(`Using transform: ${message.name}`);
+						webviewView.webview.postMessage({ command: 'updateTestingText', transformedText });
+
+					} catch (error) {
+						vscode.window.showErrorMessage(`Error applying transform: ${message.name}. Please check the function syntax.`);
+					}
+                    break;
+
+
             }
         });
 
@@ -327,8 +350,14 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                                 select.appendChild(option);
                             });
                         }
+						else if (message.command === 'updateTestingText') {
+							document.getElementById('test-output').value = message.transformedText;
+
+						}
+
                     });
 
+					// GUI Element Event Listeners:
                     document.getElementById('existing').addEventListener('change', (event) => {
                         const selectedName = event.target.value;
                         const transforms = JSON.parse(event.target.dataset.transforms || '[]');
@@ -350,8 +379,18 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                         vscode.postMessage({ command: 'deleteTransform', name });
                     });
 
+                    document.getElementById('apply-transform').addEventListener('click', () => {
+                        const name = document.getElementById('name').value;
+                        const functionCode = document.getElementById('function').value; // get the function code
+						const testInputText = document.getElementById('test-input').value; // get the test input text
+                        // vscode.postMessage({ command: 'custom-text-transform.applySnippetTransform', name, function: functionCode });
+						vscode.postMessage({ command: 'executeTransform', name, function: functionCode, arguments: testInputText });
+                    });
+
+
                     // Request to load transforms on initialization
                     vscode.postMessage({ command: 'loadTransforms' });
+
                 </script>
 			</body>
 			</html>
