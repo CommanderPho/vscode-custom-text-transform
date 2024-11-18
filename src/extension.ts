@@ -187,22 +187,30 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(TransformEditorViewProvider.viewType, provider));
 
-	context.subscriptions.push(
-		vscode.commands.registerCommand('custom-text-transform.addColor', () => {
-			provider.addColor();
-		}));
+	// context.subscriptions.push(
+	// 	vscode.commands.registerCommand('custom-text-transform.addColor', () => {
+	// 		provider.addColor();
+	// 	}));
 
-	context.subscriptions.push(
-		vscode.commands.registerCommand('custom-text-transform.clearColors', () => {
-			provider.clearColors();
-		}));
+	// context.subscriptions.push(
+	// 	vscode.commands.registerCommand('custom-text-transform.clearColors', () => {
+	// 		provider.clearColors();
+	// 	}));
 
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand('custom-text-transform.openEditor', () => {
-            openTransformEditor(context);
-        })
-    );
+    // context.subscriptions.push(
+    //     vscode.commands.registerCommand('custom-text-transform.openEditor', () => {
+    //         openTransformEditor(context);
+    //     })
+    // );
+
+    // context.subscriptions.push(
+    //     vscode.window.registerWebviewViewProvider(
+    //         TransformEditorViewProvider.viewType,
+    //         new TransformEditorViewProvider(context.extensionUri)
+    //     )
+    // );
+
 
 
 }
