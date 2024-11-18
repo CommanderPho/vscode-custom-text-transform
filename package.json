@@ -32,19 +32,23 @@
           "default": [
             {
               "name": "Variable list into Python dictionary",
-              "function": "const variableList = input.split(',').map(varName => varName.trim()); return '{' + variableList.map(varName => `'${varName}':${varName}`).join(', ') + '}'"
+              "function": "const variableList = input.split(',').map(varName => varName.trim()); return '{' + variableList.map(varName => `'${varName}':${varName}`).join(', ') + '}'",
+              "test_texts": [""]
             },
             {
               "name": "Variable list into kwargs",
-              "function": "const variableList = input.split(',').map(varName => varName.trim()); return variableList.map(varName => `${varName}=${varName}`).join(', ')"
+              "function": "const variableList = input.split(',').map(varName => varName.trim()); return variableList.map(varName => `${varName}=${varName}`).join(', ')",
+              "test_texts": [""]
             },
             {
               "name": "Function definition into classdef method definition",
-              "function": "const lines = input.trim().split('\\n'); const funcName = lines[0].trim().split(' ')[1].split('(')[0]; const args = lines[0].trim().split('(')[1].split(')')[0].split(',').map(arg => arg.trim()); const body = lines.slice(1, -1).join('\\n'); return `def ${funcName}(self, ${args.join(', ')}):${body ? '\\n' + body : ''}`"
+              "function": "const lines = input.trim().split('\\n');\nconst funcName = lines[0].trim().split(' ')[1].split('(')[0];\nconst args = lines[0].trim().split('(')[1].split(')')[0].split(',').map(arg => arg.trim());\nconst body = lines.slice(1, -1).join('\\n');\nreturn `def ${funcName}(self, ${args.join(', ')}):${body ? '\\n' + body : ''}`",
+              "test_texts": [""]
             },
             {
               "name": "Python function definition to kwargs call",
-              "function": "return input.replace(/def\\s+(\\w+)\\(([^)]*)\\):[\\s\\S]*/, (_, fnName, params) => fnName + '(' + params.replace(/\\w+\\s*(?:\\:[^=,]+)?\\s*(=\\s*[^,]+)?/g, (p) => p.trim().split('=')[0].trim() + '=' + p.trim().split('=')[0].trim()).split(',').join(', ') + ')')"
+              "function": "return input.replace(/def\\s+(\\w+)\\(([^)]*)\\):[\\s\\S]*/, (_, fnName, params) => fnName + '(' + params.replace(/\\w+\\s*(?:\\:[^=,]+)?\\s*(=\\s*[^,]+)?/g, (p) => p.trim().split('=')[0].trim() + '=' + p.trim().split('=')[0].trim()).split(',').join(', ') + ')')",
+              "test_texts": ["def check_for_and_merge_overlapping_epochs(quiescent_periods: pd.DataFrame, debug_print=False) -> pd.DataFrame:"]
             }
           ],
           "description": "Array of custom text transformations",
@@ -58,6 +62,15 @@
               "function": {
                 "type": "string",
                 "description": "Transformation function as a string"
+              },
+              "test_texts": {
+                "type": "array",
+                "description": "Testing Texts to apply the transformation function to",
+                "default": [""],
+                "items": {
+                  "type": "string",
+                  "description": "Test text to apply the transformation to"
+                } 
               }
             }
           }
