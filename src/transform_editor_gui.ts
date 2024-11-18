@@ -379,6 +379,8 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                         if (selectedTransform) {
                             document.getElementById('name').value = selectedTransform.name;
 							document.getElementById('function').value = selectedTransform.function;
+							document.getElementById('function_flattened').value = selectedTransform.function;
+
                         }
                     });
 
