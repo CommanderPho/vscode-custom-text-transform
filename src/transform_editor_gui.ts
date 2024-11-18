@@ -165,11 +165,109 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
 		<vscode-button id="apply-transform" appearance="secondary" style="margin-top: 10px;">Apply Transform</vscode-button>
 		</div>`;
 
+		// /* ================================================================================================================== */
+		// /* Basic TextArea Version                                                                                             */
+		// /* ================================================================================================================== */
+        // return `
+        //     <!DOCTYPE html>
+        //     <html lang="en">
+        //     <head>
+        //         <meta charset="UTF-8">
+        //         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        //         <title>Transform Editor</title>
+		// 		<script type="module" src="${scriptUri}" nonce="${nonce}"></script>
+		// 		<style>
+		// 			body {
+		// 				font-family: var(--vscode-font-family);
+		// 				margin: 0;
+		// 				padding: 0 10px;
+		// 			}
+		// 			vscode-dropdown, vscode-textfield, vscode-textarea {
+		// 				width: 100%;
+		// 				margin-bottom: 10px;
+		// 			}
+		// 			#function {
+		// 				font-family: monospace;
+		// 				font-size: 12px;
+		// 				width: 100%;
+		// 				height: 200px;
+		// 				margin-bottom: 10px;
+		// 			}
+		// 			vscode-button {
+		// 				margin-right: 10px;
+		// 			}
+		// 		</style>
+        //     </head>
+        //     <body>
+        //         <h1>Text Transform Editor</h1>
+        //         <label for="existing">Existing Transforms:</label>
+        //         <select id="existing">
+        //             <option value="" disabled selected>Select a transform</option>
+        //         </select>
+        //         <br />
+        //         <label for="name">Name:</label>
+        //         <input type="text" id="name" placeholder="Transform Name" style="width: 90%;" />
+        //         <br />
+        //         <label for="function">Function:</label>
+		// 		<textarea id="function" rows="10" cols="120" placeholder="Enter JavaScript Function" style="font-size: 12px; font-family: monospace;"></textarea>
+        //         <br />
+		// 		<vscode-button id="save" appearance="primary">Save Transform</vscode-button>
+		// 		<vscode-button id="delete" appearance="secondary">Delete Transform</vscode-button>
+		// 		${test_area_htmls}
+        //         <div id="output"></div>
+        //         <script nonce="${nonce}">
+        //             const vscode = acquireVsCodeApi();
+
+        //             // Populate existing transforms
+        //             window.addEventListener('message', event => {
+        //                 const message = event.data;
+        //                 if (message.command === 'loadTransforms') {
+        //                     const select = document.getElementById('existing');
+        //                     select.dataset.transforms = JSON.stringify(message.transforms); // Store transforms for later use
+
+        //                     select.innerHTML = '<option value="" disabled selected>Select a transform</option>';
+        //                     message.transforms.forEach(transform => {
+        //                         const option = document.createElement('option');
+        //                         option.value = transform.name;
+        //                         option.textContent = transform.name;
+        //                         select.appendChild(option);
+        //                     });
+        //                 }
+        //             });
+
+        //             document.getElementById('existing').addEventListener('change', (event) => {
+        //                 const selectedName = event.target.value;
+        //                 const transforms = JSON.parse(event.target.dataset.transforms || '[]');
+        //                 const selectedTransform = transforms.find(t => t.name === selectedName);
+        //                 if (selectedTransform) {
+        //                     document.getElementById('name').value = selectedTransform.name;
+		// 					document.getElementById('function').value = selectedTransform.function;
+        //                 }
+        //             });
+
+        //             document.getElementById('save').addEventListener('click', () => {
+        //                 const name = document.getElementById('name').value;
+        //                 const functionCode = document.getElementById('function').value;
+        //                 vscode.postMessage({ command: 'saveTransform', name, function: functionCode });
+        //             });
+
+        //             document.getElementById('delete').addEventListener('click', () => {
+        //                 const name = document.getElementById('name').value;
+        //                 vscode.postMessage({ command: 'deleteTransform', name });
+        //             });
+
+        //             // Request to load transforms on initialization
+        //             vscode.postMessage({ command: 'loadTransforms' });
+        //         </script>
+        //     </body>
+        //     </html>
+        // `;
+
 		/* ================================================================================================================== */
-		/* Basic TextArea Version                                                                                             */
+		/* VSCode-elements version:                                                                                           */
 		/* ================================================================================================================== */
         return `
-            <!DOCTYPE html>
+			<!DOCTYPE html>
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
@@ -198,24 +296,20 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
 					}
 				</style>
             </head>
-            <body>
-                <h1>Text Transform Editor</h1>
-                <label for="existing">Existing Transforms:</label>
-                <select id="existing">
-                    <option value="" disabled selected>Select a transform</option>
-                </select>
-                <br />
-                <label for="name">Name:</label>
-                <input type="text" id="name" placeholder="Transform Name" style="width: 90%;" />
-                <br />
-                <label for="function">Function:</label>
-				<textarea id="function" rows="10" cols="120" placeholder="Enter JavaScript Function" style="font-size: 12px; font-family: monospace;"></textarea>
-                <br />
-                <button id="save">Save Transform</button>
-                <button id="delete">Delete Transform</button>
+			<body>
+				<h1>Text Transform Editor</h1>
+                <vscode-label for="existing">Existing Transforms:</vscode-label>
+                <vscode-single-select id="existing">
+                    <vscode-option value="" disabled selected>Select a transform</vscode-option>
+                </vscode-single-select>
+				<vscode-textfield id="name" placeholder="Transform Name" aria-label="Transform Name"></vscode-textfield>
+				<vscode-label for="function">Function:</vscode-label>
+				<vscode-textarea monospace id="function" placeholder="Enter JavaScript Function"></vscode-textarea>
+				<vscode-button id="save" appearance="primary">Save Transform</vscode-button>
+				<vscode-button id="delete" appearance="secondary">Delete Transform</vscode-button>
 				${test_area_htmls}
-                <div id="output"></div>
-                <script nonce="${nonce}">
+				<div id="output"></div>
+				<script nonce="${nonce}">
                     const vscode = acquireVsCodeApi();
 
                     // Populate existing transforms
@@ -225,9 +319,9 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                             const select = document.getElementById('existing');
                             select.dataset.transforms = JSON.stringify(message.transforms); // Store transforms for later use
 
-                            select.innerHTML = '<option value="" disabled selected>Select a transform</option>';
+                            select.innerHTML = '<vscode-option value="" disabled selected>Select a transform</vscode-option>';
                             message.transforms.forEach(transform => {
-                                const option = document.createElement('option');
+                                const option = document.createElement('vscode-option');
                                 option.value = transform.name;
                                 option.textContent = transform.name;
                                 select.appendChild(option);
@@ -259,109 +353,14 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                     // Request to load transforms on initialization
                     vscode.postMessage({ command: 'loadTransforms' });
                 </script>
-            </body>
-            </html>
+			</body>
+			</html>
         `;
 
+
 		/* ================================================================================================================== */
-		/* VSCode-elements version:                                                                                           */
+		/* More complex editor (Monoco Editor):                                                                               */
 		/* ================================================================================================================== */
-        // return `
-		// 	<!DOCTYPE html>
-		// 	<html lang="en">
-		// 	<head>
-		// 		<meta charset="UTF-8">
-		// 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		// 		<title>Transform Editor</title>
-		// 		<script type="module" src="https://unpkg.com/@vscode/webview-ui-toolkit@1.1.2/dist/toolkit.min.js" nonce="${nonce}"></script>
-		// 		<style>
-		// 			body {
-		// 				font-family: var(--vscode-font-family);
-		// 				margin: 0;
-		// 				padding: 0 10px;
-		// 			}
-		// 			vscode-dropdown {
-		// 				width: 100%;
-		// 			}
-		// 			vscode-textfield {
-		// 				width: 100%;
-		// 				margin-bottom: 10px;
-		// 			}
-		// 			#function {
-		// 				font-family: monospace;
-		// 				font-size: 12px;
-		// 				width: 100%;
-		// 				height: 200px;
-		// 				margin-bottom: 10px;
-		// 			}
-		// 			vscode-button {
-		// 				margin-right: 10px;
-		// 			}
-		// 		</style>
-		// 	</head>
-		// 	<body>
-		// 		<h1>Text Transform Editor</h1>
-		// 		<vscode-dropdown id="existing" placeholder="Select a transform">
-		// 			<vscode-option disabled selected>Select a transform</vscode-option>
-		// 		</vscode-dropdown>
-		// 		<vscode-textfield id="name" placeholder="Transform Name" aria-label="Transform Name"></vscode-textfield>
-		// 		<label for="function">Function:</label>
-		// 		<textarea id="function" placeholder="Enter JavaScript Function"></textarea>
-		// 		<vscode-button id="save" appearance="primary">Save Transform</vscode-button>
-		// 		<vscode-button id="delete" appearance="secondary">Delete Transform</vscode-button>
-		// 		<div id="output"></div>
-		// 		<script>
-		// 			const vscode = acquireVsCodeApi();
-
-		// 			// Populate dropdown with existing transforms
-		// 			window.addEventListener('message', (event) => {
-		// 				const message = event.data;
-
-		// 				if (message.command === 'loadTransforms') {
-		// 					const dropdown = document.getElementById('existing');
-		// 					dropdown.innerHTML = '<vscode-option disabled selected>Select a transform</vscode-option>'; // Reset dropdown
-		// 					dropdown.dataset.transforms = JSON.stringify(message.transforms);
-
-		// 					message.transforms.forEach((transform) => {
-		// 						const option = document.createElement('vscode-option');
-		// 						option.value = transform.name;
-		// 						option.textContent = transform.name;
-		// 						dropdown.appendChild(option);
-		// 					});
-		// 				}
-		// 			});
-
-		// 			document.getElementById('existing').addEventListener('change', (event) => {
-		// 				const selectedName = event.target.value;
-		// 				const transforms = JSON.parse(event.target.dataset.transforms || '[]');
-		// 				const selectedTransform = transforms.find(t => t.name === selectedName);
-
-		// 				if (selectedTransform) {
-		// 					document.getElementById('name').value = selectedTransform.name;
-		// 					document.getElementById('function').value = selectedTransform.function.replace(/\\n/g, '\n');
-		// 				} else {
-		// 					document.getElementById('name').value = '';
-		// 					document.getElementById('function').value = '';
-		// 				}
-		// 			});
-
-		// 			document.getElementById('save').addEventListener('click', () => {
-		// 				const name = document.getElementById('name').value;
-		// 				const functionCode = document.getElementById('function').value.replace(/\n/g, '\\n'); // Escape newlines for JSON storage
-		// 				vscode.postMessage({ command: 'saveTransform', name, function: functionCode });
-		// 			});
-
-		// 			document.getElementById('delete').addEventListener('click', () => {
-		// 				const name = document.getElementById('name').value;
-		// 				vscode.postMessage({ command: 'deleteTransform', name });
-		// 			});
-		// 		</script>
-		// 	</body>
-		// 	</html>
-        // `;
-
-
-		// // More complex editor (Monoco Editor):
 		// return `
 		// 	<!DOCTYPE html>
 		// 	<html lang="en">
