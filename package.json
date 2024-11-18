@@ -67,6 +67,10 @@
       {
         "command": "custom-text-transform.transformSelectedText",
         "title": "🌀💫Custom Transform Selected Text..."
+      },
+      {
+        "command": "custom-text-transform.openEditor",
+        "title": "🌀Custom Transform: Open Transform Editor GUI"
       }
     ]
   },

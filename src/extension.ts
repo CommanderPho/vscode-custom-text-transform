@@ -180,7 +180,105 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(transformProvider);
 
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('custom-text-transform.openEditor', () => {
+            openTransformEditor(context);
+        })
+    );
+
+
 }
 
 // This method is called when your extension is deactivated
 export function deactivate() {}
+
+
+function openTransformEditor(context: vscode.ExtensionContext) {
+    const panel = vscode.window.createWebviewPanel(
+        'transformEditor',
+        'Text Transform Editor',
+        vscode.ViewColumn.One,
+        {
+            enableScripts: true
+        }
+    );
+
+    panel.webview.html = getWebviewContent();
+
+    // Handle messages from the WebView
+    panel.webview.onDidReceiveMessage(async (message) => {
+        switch (message.command) {
+            case 'testTransform':
+                const editor = vscode.window.activeTextEditor;
+                if (editor) {
+                    const input = editor.document.getText(editor.selection);
+                    try {
+                        const result = eval(message.function)(input);
+                        panel.webview.postMessage({ command: 'transformResult', result });
+                    } catch (error) {
+                    if (error instanceof Error) {
+                        panel.webview.postMessage({ command: 'error', error: error.message });
+                    } else {
+                        panel.webview.postMessage({ command: 'error', error: String(error) });
+                    }
+                }
+                }
+                break;
+            case 'saveTransform':
+                const config = vscode.workspace.getConfiguration('custom-text-transform');
+                const transforms: { name: string, function: string }[] = config.get('transforms') || [];
+                transforms.push({ name: message.name, function: message.function });
+                await config.update('transforms', transforms, vscode.ConfigurationTarget.Global);
+                vscode.window.showInformationMessage(`Transform "${message.name}" saved.`);
+                break;
+        }
+    });
+}
+
+function getWebviewContent() {
+    return `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Transform Editor</title>
+        </head>
+        <body>
+            <h1>Create a New Transform</h1>
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Transform Name" />
+            <br />
+            <label for="function">Function:</label>
+            <textarea id="function" rows="10" cols="50" placeholder="Enter JavaScript Function"></textarea>
+            <br />
+            <button id="test">Test Transform</button>
+            <button id="save">Save Transform</button>
+            <div id="output"></div>
+            <script>
+                const vscode = acquireVsCodeApi();
+                document.getElementById('test').addEventListener('click', () => {
+                    const functionCode = document.getElementById('function').value;
+                    vscode.postMessage({ command: 'testTransform', function: functionCode });
+                });
+                document.getElementById('save').addEventListener('click', () => {
+                    const name = document.getElementById('name').value;
+                    const functionCode = document.getElementById('function').value;
+                    vscode.postMessage({ command: 'saveTransform', name, function: functionCode });
+                });
+                window.addEventListener('message', event => {
+                    const message = event.data;
+                    if (message.command === 'transformResult') {
+                        document.getElementById('output').innerText = "Result: " + message.result;
+                    } else if (message.command === 'error') {
+                        document.getElementById('output').innerText = "Error: " + message.error;
+                    }
+                });
+            </script>
+        </body>
+        </html>
+    `;
+}
+
+
