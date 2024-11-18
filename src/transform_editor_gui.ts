@@ -49,6 +49,11 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                         transforms = [];
                     }
                     webviewView.webview.postMessage({ command: 'loadTransforms', transforms });
+					// webviewView.webview.postMessage({
+					// 	command: 'populateEditor',
+					// 	function: selectedTransform.function
+					// });
+
                     break;
 
                 case 'saveTransform':
@@ -69,6 +74,8 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                     break;
             }
         });
+
+
 
 	}
 
@@ -94,7 +101,6 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
 
 	private _getHtmlForWebview(webview: vscode.Webview) {
         const nonce = getNonce();
-
         return `
             <!DOCTYPE html>
             <html lang="en">
@@ -145,13 +151,13 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                         const selectedTransform = transforms.find(t => t.name === selectedName);
                         if (selectedTransform) {
                             document.getElementById('name').value = selectedTransform.name;
-                            document.getElementById('function').value = selectedTransform.function;
+                            document.getElementById('function').value = selectedTransform.function.replace(/\\n/g, '\n');
                         }
                     });
 
                     document.getElementById('save').addEventListener('click', () => {
                         const name = document.getElementById('name').value;
-                        const functionCode = document.getElementById('function').value;
+                        const functionCode = document.getElementById('function').value.replace(/\n/g, '\\n');
                         vscode.postMessage({ command: 'saveTransform', name, function: functionCode });
                     });
 
@@ -166,6 +172,97 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
             </body>
             </html>
         `;
+		// // More complex editor (Monoco Editor):
+		// return `
+		// 	<!DOCTYPE html>
+		// 	<html lang="en">
+		// 	<head>
+		// 		<meta charset="UTF-8">
+		// 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		// 		<title>Transform Editor</title>
+		// 		<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.42.0/min/vs/loader.js" nonce="${nonce}"></script>
+		// 		<style>
+		// 			#function-editor {
+		// 				width: 100%;
+		// 				height: 300px;
+		// 				border: 1px solid #ccc;
+		// 				margin-top: 8px;
+		// 				border-radius: 4px;
+		// 			}
+		// 		</style>
+		// 	</head>
+		// 	<body>
+		// 		<h1>Text Transform Editor</h1>
+		// 		<label for="existing">Existing Transforms:</label>
+		// 		<select id="existing">
+		// 			<option value="" disabled selected>Select a transform</option>
+		// 		</select>
+		// 		<br />
+		// 		<label for="name">Name:</label>
+		// 		<input type="text" id="name" placeholder="Transform Name" />
+		// 		<br />
+		// 		<label for="function">Function:</label>
+		// 		<div id="function-editor"></div>
+		// 		<br />
+		// 		<button id="save">Save Transform</button>
+		// 		<button id="delete">Delete Transform</button>
+		// 		<div id="output"></div>
+		// 		<script nonce="${nonce}">
+		// 			const vscode = acquireVsCodeApi();
+
+		// 			// Load Monaco Editor when the page is ready
+		// 			require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.42.0/min/vs' } });
+		// 			require(['vs/editor/editor.main'], function () {
+		// 				const editor = monaco.editor.create(document.getElementById('function-editor'), {
+		// 					value: '', // Initial empty value
+		// 					language: 'javascript', // Use 'typescript' for TypeScript
+		// 					theme: 'vs-dark', // Optional: 'vs' for light theme
+		// 					automaticLayout: true, // Automatically resize with the container
+		// 					fontSize: 12 // Smaller font size
+		// 				});
+
+		// 				// Populate editor content when a transform is selected
+		// 				window.addEventListener('message', (event) => {
+		// 					const message = event.data;
+		// 					if (message.command === 'loadTransforms') {
+		// 						const select = document.getElementById('existing');
+		// 						select.dataset.transforms = JSON.stringify(message.transforms);
+
+		// 						select.innerHTML = '<option value="" disabled selected>Select a transform</option>';
+		// 						message.transforms.forEach(transform => {
+		// 							const option = document.createElement('option');
+		// 							option.value = transform.name;
+		// 							option.textContent = transform.name;
+		// 							select.appendChild(option);
+		// 						});
+		// 					} else if (message.command === 'populateEditor') {
+		// 						editor.setValue(message.function);
+		// 					}
+		// 				});
+
+		// 				// Handle Save Button
+		// 				document.getElementById('save').addEventListener('click', () => {
+		// 					const name = document.getElementById('name').value;
+		// 					const functionCode = editor.getValue();
+		// 					vscode.postMessage({ command: 'saveTransform', name, function: functionCode });
+		// 				});
+
+		// 				// Notify Extension on Change
+		// 				document.getElementById('existing').addEventListener('change', (event) => {
+		// 					const selectedName = event.target.value;
+		// 					const transforms = JSON.parse(event.target.dataset.transforms || '[]');
+		// 					const selectedTransform = transforms.find(t => t.name === selectedName);
+		// 					if (selectedTransform) {
+		// 						document.getElementById('name').value = selectedTransform.name;
+		// 						vscode.postMessage({ command: 'populateEditor', function: selectedTransform.function });
+		// 					}
+		// 				});
+		// 			});
+		// 		</script>
+		// 	</body>
+		// 	</html>
+		// `;
+
 	}
 }
 
