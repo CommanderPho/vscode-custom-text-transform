@@ -32,7 +32,7 @@ To define custom transforms:
 
 ```bash
 npm install
-cp -R node_modules/@vscode-elements/elements/dist/*  media/
+cp node_modules/@vscode-elements/elements/dist/bundled.js  media/bundled.js
 
 ```
 

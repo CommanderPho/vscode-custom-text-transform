@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 // import "@vscode-elements/elements/dist/vscode-button/index.js";
 
+
 export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
 
 	public static readonly viewType = 'custom-text-transform.transformEditorGuiView';
@@ -174,10 +175,7 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Transform Editor</title>
-				<script
-				src="node_modules/@vscode-elements/elements/dist/bundled.js"
-				type="module"
-				></script>
+				<script type="module" src="${scriptUri}" nonce="${nonce}"></script>
 				<style>
 					body {
 						font-family: var(--vscode-font-family);
