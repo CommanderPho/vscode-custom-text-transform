@@ -203,7 +203,11 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                         const selectedTransform = transforms.find(t => t.name === selectedName);
                         if (selectedTransform) {
                             document.getElementById('name').value = selectedTransform.name;
-                            document.getElementById('function').value = selectedTransform.function;
+							<!-- const originalString = selectedTransform.function;  -->
+							<!-- const updatedString = originalString.replace(/;/g, ';\n'); -->
+                            <!-- document.getElementById('function').value = originalString;  -->
+							document.getElementById('function').value = selectedTransform.function;
+
                         }
                     });
 
