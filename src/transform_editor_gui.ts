@@ -328,6 +328,20 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
 				<vscode-textfield id="name" placeholder="Transform Name" aria-label="Transform Name"></vscode-textfield>
 				<vscode-label for="function">Function:</vscode-label>
 				<vscode-textarea monospace id="function" placeholder="Enter JavaScript Function"></vscode-textarea>
+				<vscode-textfield id="function_flattened" placeholder="Flattened JavaScript Function" readonly="true" style="width: 100%;>
+					<vscode-badge slot="content-after">308 Settings Found</vscode-badge>
+					<vscode-icon
+					slot="content-after"
+					name="clear-all"
+					title="clear-all"
+					action-icon
+					></vscode-icon>
+					<vscode-icon
+					slot="content-after"
+					name="filter"
+					action-icon
+					></vscode-icon>
+				</vscode-textfield>
 				<vscode-button id="save" appearance="primary">Save Transform</vscode-button>
 				<vscode-button id="delete" appearance="secondary">Delete Transform</vscode-button>
 				${test_area_htmls}
