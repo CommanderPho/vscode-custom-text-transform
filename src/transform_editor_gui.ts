@@ -55,7 +55,7 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                         transforms = [];
                     }
 					// transforms = transforms.map(t => ({ name: t.name, function: t.function.replace(/;/g, ';\n') })); // Add newlines for display
-					transforms = transforms.map(t => ({ name: t.name, function: t.function.replace(/;(?!\n)/g, ';\n') })); // Add newlines for display
+					transforms = transforms.map(t => ({ name: t.name, function: t.function.replace(/;(?!\n)/g, ';\n'), flattened_function: t.function, test_texts: t.test_texts })); // Add newlines for display
 
                     webviewView.webview.postMessage({ command: 'loadTransforms', transforms });
 					// webviewView.webview.postMessage({
@@ -70,7 +70,8 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                     if (existingIndex >= 0) {
                         transforms[existingIndex] = { name: message.name, function: message.function };
                     } else {
-                        transforms.push({ name: message.name, function: message.function });
+						transforms.push({ name: message.name, function: message.function });
+                        // transforms.push({ name: message.name, function: message.function, test_texts: message.test_texts });
                     }
                     await config.update('transforms', transforms, vscode.ConfigurationTarget.Global);
                     vscode.window.showInformationMessage(`Transform "${message.name}" saved.`);
@@ -87,6 +88,7 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
 					// message.function = message.function.replace(/;(?!\n)/g, ';\n'); // Add newlines for display
 					const function_code = message.function;
 					const text = message.arguments
+					// const text = message.test_texts
 					
 					// WARNING: Executing arbitrary code using eval has security implications and should be done with caution.
 					try {
@@ -328,19 +330,8 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
 				<vscode-textfield id="name" placeholder="Transform Name" aria-label="Transform Name"></vscode-textfield>
 				<vscode-label for="function">Function:</vscode-label>
 				<vscode-textarea monospace id="function" placeholder="Enter JavaScript Function"></vscode-textarea>
-				<vscode-textfield id="function_flattened" placeholder="Flattened JavaScript Function" readonly="true" style="width: 100%;>
-					<vscode-badge slot="content-after">308 Settings Found</vscode-badge>
-					<vscode-icon
-					slot="content-after"
-					name="clear-all"
-					title="clear-all"
-					action-icon
-					></vscode-icon>
-					<vscode-icon
-					slot="content-after"
-					name="filter"
-					action-icon
-					></vscode-icon>
+				<vscode-textfield monospace id="function_flattened" placeholder="Flattened JavaScript Function" readonly="true" style="width: 100%;>
+					<vscode-icon slot="content-before" name="filter" action-icon></vscode-icon>
 				</vscode-textfield>
 				<vscode-button id="save" appearance="primary">Save Transform</vscode-button>
 				<vscode-button id="delete" appearance="secondary">Delete Transform</vscode-button>
@@ -355,7 +346,6 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                         if (message.command === 'loadTransforms') {
                             const select = document.getElementById('existing');
                             select.dataset.transforms = JSON.stringify(message.transforms); // Store transforms for later use
-
                             select.innerHTML = '<vscode-option value="" disabled selected>Select a transform</vscode-option>';
                             message.transforms.forEach(transform => {
                                 const option = document.createElement('vscode-option');
@@ -363,10 +353,10 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                                 option.textContent = transform.name;
                                 select.appendChild(option);
                             });
+							document.getElementById('test-input').value = "";
                         }
 						else if (message.command === 'updateTestingText') {
 							document.getElementById('test-output').value = message.transformedText;
-
 						}
 
                     });
@@ -379,7 +369,12 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                         if (selectedTransform) {
                             document.getElementById('name').value = selectedTransform.name;
 							document.getElementById('function').value = selectedTransform.function;
-							document.getElementById('function_flattened').value = selectedTransform.function;
+							document.getElementById('function_flattened').value = selectedTransform.flattened_function;
+
+							// const test_texts = selectedTransform.test_texts || [];
+							// if len(test_texts) > 0 {
+							// 	document.getElementById('test-input').value = selectedTransform.test_texts[0];
+							// }
 
                         }
                     });
@@ -387,7 +382,9 @@ export class TransformEditorViewProvider implements vscode.WebviewViewProvider {
                     document.getElementById('save').addEventListener('click', () => {
                         const name = document.getElementById('name').value;
                         const functionCode = document.getElementById('function').value;
-                        vscode.postMessage({ command: 'saveTransform', name, function: functionCode });
+						vscode.postMessage({ command: 'saveTransform', name, function: functionCode });
+						// const test_texts = [document.getElementById('test-input').value];
+                        // vscode.postMessage({ command: 'saveTransform', name, function: functionCode, test_texts: test_texts });
                     });
 
                     document.getElementById('delete').addEventListener('click', () => {
