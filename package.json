@@ -42,13 +42,18 @@
             },
             {
               "name": "Function definition into classdef method definition",
-              "function": "const lines = input.trim().split('\\n');\nconst funcName = lines[0].trim().split(' ')[1].split('(')[0];\nconst args = lines[0].trim().split('(')[1].split(')')[0].split(',').map(arg => arg.trim());\nconst body = lines.slice(1, -1).join('\\n');\nreturn `def ${funcName}(self, ${args.join(', ')}):${body ? '\\n' + body : ''}`",
-              "test_texts": [""]
+              "function": "const lines = input.trim().split('\\n');\nconst funcName = lines[0].trim().split(' ')[1].split('(')[0];\nconst args = lines[0].trim().split('(')[1].split(')')[0].split(',').map(arg => arg.trim());\nconst body = lines.slice(1, -1).join('\\n');\nreturn `@classmethod\\ndef ${funcName}(cls, ${args.join(', ')}):${body ? '\\n' + body : ''}`",
+              "test_texts": ["def check_for_and_merge_overlapping_epochs(quiescent_periods: pd.DataFrame, debug_print=False) -> pd.DataFrame:"]
             },
             {
               "name": "Python function definition to kwargs call",
               "function": "return input.replace(/def\\s+(\\w+)\\(([^)]*)\\):[\\s\\S]*/, (_, fnName, params) => fnName + '(' + params.replace(/\\w+\\s*(?:\\:[^=,]+)?\\s*(=\\s*[^,]+)?/g, (p) => p.trim().split('=')[0].trim() + '=' + p.trim().split('=')[0].trim()).split(',').join(', ') + ')')",
               "test_texts": ["def check_for_and_merge_overlapping_epochs(quiescent_periods: pd.DataFrame, debug_print=False) -> pd.DataFrame:"]
+            },
+            {
+              "name": "Python strip typehints definition to kwargs call",
+              "function": "return input.replace(/def\\s+(\\w+)\\(([^)]*)\\):[\\s\\S]*/, (_, fnName, params) => fnName + '(' + params.replace(/(\\w+)\\s*(?::[^=,]+)?\\s*(?:=[^,]+)?/g, (match, p1) => p1 + '=' + p1).split(',').join(', ') + ')');",
+              "test_texts": [""]
             }
           ],
           "description": "Array of custom text transformations",
