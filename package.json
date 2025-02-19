@@ -5,7 +5,7 @@
   "publisher": "phohale",
   "repository": "https://github.com/CommanderPho/vscode-custom-text-transform",
   "icon": "images/vscode_xform_icon.png",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "engines": {
     "vscode": "^1.88.0"
   },
@@ -33,27 +33,50 @@
             {
               "name": "Variable list into Python dictionary",
               "function": "const variableList = input.split(',').map(varName => varName.trim()); return '{' + variableList.map(varName => `'${varName}':${varName}`).join(', ') + '}'",
-              "test_texts": [""]
+              "test_texts": []
             },
             {
               "name": "Variable list into kwargs",
               "function": "const variableList = input.split(',').map(varName => varName.trim()); return variableList.map(varName => `${varName}=${varName}`).join(', ')",
-              "test_texts": [""]
+              "test_texts": []
             },
             {
               "name": "Function definition into classdef method definition",
               "function": "const lines = input.trim().split('\\n');\nconst funcName = lines[0].trim().split(' ')[1].split('(')[0];\nconst args = lines[0].trim().split('(')[1].split(')')[0].split(',').map(arg => arg.trim());\nconst body = lines.slice(1, -1).join('\\n');\nreturn `@classmethod\\ndef ${funcName}(cls, ${args.join(', ')}):${body ? '\\n' + body : ''}`",
-              "test_texts": ["def check_for_and_merge_overlapping_epochs(quiescent_periods: pd.DataFrame, debug_print=False) -> pd.DataFrame:"]
+              "test_texts": [
+                {
+                  "input": "def check_for_and_merge_overlapping_epochs(quiescent_periods: pd.DataFrame, debug_print=False) -> pd.DataFrame:",
+                  "expected": "@classmethod\ndef check_for_and_merge_overlapping_epochs(cls, quiescent_periods: pd.DataFrame, debug_print=False) -> pd.DataFrame:"
+                }
+              ]
             },
             {
               "name": "Python function definition to kwargs call",
               "function": "return input.replace(/def\\s+(\\w+)\\(([^)]*)\\):[\\s\\S]*/, (_, fnName, params) => fnName + '(' + params.replace(/\\w+\\s*(?:\\:[^=,]+)?\\s*(=\\s*[^,]+)?/g, (p) => p.trim().split('=')[0].trim() + '=' + p.trim().split('=')[0].trim()).split(',').join(', ') + ')')",
-              "test_texts": ["def check_for_and_merge_overlapping_epochs(quiescent_periods: pd.DataFrame, debug_print=False) -> pd.DataFrame:"]
+              "test_texts": [
+                {
+                  "input": "def check_for_and_merge_overlapping_epochs(quiescent_periods: pd.DataFrame, debug_print=False) -> pd.DataFrame:",
+                  "expected": "check_for_and_merge_overlapping_epochs(quiescent_periods=quiescent_periods, debug_print=debug_print)"
+                },
+                {
+                  "input": "include_includelist=None, included_computation_filter_names=None, include_global_functions=False, fail_on_exception=False, progress_print=True, debug_print=False, force_recompute:bool=False, force_recompute_override_computations_includelist=None",
+                  "expected": "include_includelist=include_includelist, included_computation_filter_names=included_computation_filter_names, include_global_functions=include_global_functions, fail_on_exception=fail_on_exception, progress_print=progress_print, debug_print=debug_print, force_recompute=force_recompute, force_recompute_override_computations_includelist=force_recompute_override_computations_includelist"
+                }
+              ]
             },
             {
               "name": "Python strip typehints definition to kwargs call",
               "function": "return input.replace(/def\\s+(\\w+)\\(([^)]*)\\):[\\s\\S]*/, (_, fnName, params) => fnName + '(' + params.replace(/(\\w+)\\s*(?::[^=,]+)?\\s*(?:=[^,]+)?/g, (match, p1) => p1 + '=' + p1).split(',').join(', ') + ')');",
-              "test_texts": [""]
+              "test_texts": [
+                {
+                  "input": "def check_for_and_merge_overlapping_epochs(quiescent_periods: pd.DataFrame, debug_print=False) -> pd.DataFrame:",
+                  "expected": "check_for_and_merge_overlapping_epochs(quiescent_periods=quiescent_periods, debug_print=debug_print)"
+                },
+                {
+                  "input": "include_includelist=None, included_computation_filter_names=None, include_global_functions=False, fail_on_exception=False, progress_print=True, debug_print=False, force_recompute:bool=False, force_recompute_override_computations_includelist=None",
+                  "expected": "include_includelist=include_includelist, included_computation_filter_names=included_computation_filter_names, include_global_functions=include_global_functions, fail_on_exception=fail_on_exception, progress_print=progress_print, debug_print=debug_print, force_recompute=force_recompute, force_recompute_override_computations_includelist=force_recompute_override_computations_includelist"
+                }
+              ]
             }
           ],
           "description": "Array of custom text transformations",
@@ -70,12 +93,20 @@
               },
               "test_texts": {
                 "type": "array",
-                "description": "Testing Texts to apply the transformation function to",
-                "default": [""],
+                "description": "Test cases with input and expected output pairs",
                 "items": {
-                  "type": "string",
-                  "description": "Test text to apply the transformation to"
-                } 
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "string",
+                      "description": "Input text to transform"
+                    },
+                    "expected": {
+                      "type": "string",
+                      "description": "Expected output after transformation"
+                    }
+                  }
+                }
               }
             }
           }
